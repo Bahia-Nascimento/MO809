@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package mlrpc;
+
+message Sample {
+    repeated float data = 1;
+    int32 label = 2;
+}
+
+message FitRequest {
+    repeated Sample samples = 1;
+}
+
+message FitResponse {
+    float acc = 1;
+}
+
+message PredictRequest {
+    repeated Sample samples = 1;
+}
+
+message PredictResponse {
+    repeated int32 predictions = 1;
+    float acc = 2;
+}
+
+service ML {
+    rpc GetFit(FitRequest) returns (FitResponse) {}
+    rpc GetPredict(PredictRequest) returns (PredictResponse) {}
+}
