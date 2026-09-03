@@ -34,6 +34,16 @@ class MLStub:
         Args:
             channel: A grpc.Channel.
         """
+        self.GetTrainingData = channel.unary_unary(
+                '/mlrpc.ML/GetTrainingData',
+                request_serializer=ml__pb2.TrainingDataRequest.SerializeToString,
+                response_deserializer=ml__pb2.TrainingDataResponse.FromString,
+                _registered_method=True)
+        self.SubmitModelUpdate = channel.unary_unary(
+                '/mlrpc.ML/SubmitModelUpdate',
+                request_serializer=ml__pb2.ModelUpdateRequest.SerializeToString,
+                response_deserializer=ml__pb2.ModelUpdateResponse.FromString,
+                _registered_method=True)
         self.GetFit = channel.unary_unary(
                 '/mlrpc.ML/GetFit',
                 request_serializer=ml__pb2.FitRequest.SerializeToString,
@@ -48,6 +58,18 @@ class MLStub:
 
 class MLServicer:
     """Missing associated documentation comment in .proto file."""
+
+    def GetTrainingData(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SubmitModelUpdate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def GetFit(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -64,6 +86,16 @@ class MLServicer:
 
 def add_MLServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'GetTrainingData': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTrainingData,
+                    request_deserializer=ml__pb2.TrainingDataRequest.FromString,
+                    response_serializer=ml__pb2.TrainingDataResponse.SerializeToString,
+            ),
+            'SubmitModelUpdate': grpc.unary_unary_rpc_method_handler(
+                    servicer.SubmitModelUpdate,
+                    request_deserializer=ml__pb2.ModelUpdateRequest.FromString,
+                    response_serializer=ml__pb2.ModelUpdateResponse.SerializeToString,
+            ),
             'GetFit': grpc.unary_unary_rpc_method_handler(
                     servicer.GetFit,
                     request_deserializer=ml__pb2.FitRequest.FromString,
@@ -84,6 +116,60 @@ def add_MLServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class ML:
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def GetTrainingData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/mlrpc.ML/GetTrainingData',
+            ml__pb2.TrainingDataRequest.SerializeToString,
+            ml__pb2.TrainingDataResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SubmitModelUpdate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/mlrpc.ML/SubmitModelUpdate',
+            ml__pb2.ModelUpdateRequest.SerializeToString,
+            ml__pb2.ModelUpdateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetFit(request,

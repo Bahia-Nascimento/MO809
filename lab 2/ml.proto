@@ -12,10 +12,23 @@ message FitRequest {
 }
 
 message TrainingDataRequest {
+    int32 client_id = 1;
 }
 
 message TrainingDataResponse {
     repeated Sample samples = 1;
+}
+
+message ModelUpdateRequest {
+    int32 client_id = 1;
+    repeated float weights = 2;
+    repeated float intercept = 3;
+}
+
+message ModelUpdateResponse {
+    bool accepted = 1;
+    float global_acc = 2;
+    float global_acc_without_detection = 3;
 }
 
 message FitResponse {
@@ -33,6 +46,7 @@ message PredictResponse {
 
 service ML {
     rpc GetTrainingData(TrainingDataRequest) returns (TrainingDataResponse) {}
+    rpc SubmitModelUpdate(ModelUpdateRequest) returns (ModelUpdateResponse) {}
     rpc GetFit(FitRequest) returns (FitResponse) {}
     rpc GetPredict(PredictRequest) returns (PredictResponse) {}
 }

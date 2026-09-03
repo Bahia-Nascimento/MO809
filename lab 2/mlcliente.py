@@ -1,61 +1,98 @@
+import sys
+
 import grpc
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+
 import ml_pb2 as pb2
 import ml_pb2_grpc as pb2_grpc
-import time
 
-class ExemploGRPC(object):
 
-    def __init__(self):
-        self.host = 'localhost'
-        self.server_port = 50051
-        self.channel     = grpc.insecure_channel(f"{self.host}:{self.server_port}")
-        self.stub        = pb2_grpc.MLStub(self.channel)
-    
-    def get_fit(self, atributos, rotulos):
-        samples = []
+NUM_CLIENTS = 5
+FEATURE_MIN = 0.0
+FEATURE_MAX = 16.0
 
-        for data, label in zip(atributos, rotulos):
-            sample = pb2.Sample(
-                data=data,
-                label=label
-            )
-            samples.append(sample)
+BEHAVIOR_NAMES = {
+    0: 'normal',
+    1: 'ruído em todas as features',
+    2: 'ruído em uma feature',
+    3: 'rótulos invertidos',
+}
 
-        request = pb2.FitRequest(samples=samples)
 
-        return self.stub.GetFit(request)
-    
-    def get_predict(self, atributos, rotulos):
-        samples = []
+class Cliente:
+    def __init__(self, client_id):
+        self.client_id = client_id
+        self.channel = grpc.insecure_channel('localhost:50051')
+        self.stub = pb2_grpc.MLStub(self.channel)
 
-        for data, label in zip(atributos, rotulos):
-            sample = pb2.Sample(
-                data=data,
-                label=label
-            )
-            samples.append(sample)
+    def get_training_data(self):
+        request = pb2.TrainingDataRequest(client_id=self.client_id)
+        return self.stub.GetTrainingData(request)
 
-        request = pb2.PredictRequest(samples=samples)
+    def submit_model_update(self, model):
+        request = pb2.ModelUpdateRequest(
+            client_id=self.client_id,
+            weights=model.coef_.ravel().tolist(),
+            intercept=model.intercept_.tolist(),
+        )
+        return self.stub.SubmitModelUpdate(request)
 
-        return self.stub.GetPredict(request)
-    
+
+def executar_cliente(client_id, behavior_id):
+    if not 0 <= client_id < NUM_CLIENTS:
+        raise ValueError(f'client_id deve estar entre 0 e {NUM_CLIENTS - 1}')
+    if behavior_id not in BEHAVIOR_NAMES:
+        raise ValueError('behavior_id deve estar entre 0 e 3')
+
+    client = Cliente(client_id)
+    resposta = client.get_training_data()
+    atributos = np.array([sample.data for sample in resposta.samples])
+    rotulos = np.array([sample.label for sample in resposta.samples])
+
+    rng = np.random.default_rng(1000 + client_id)
+    if behavior_id == 1:
+        atributos = rng.uniform(
+            FEATURE_MIN,
+            FEATURE_MAX,
+            size=atributos.shape,
+        )
+    elif behavior_id == 2:
+        feature_id = int(rng.integers(atributos.shape[1]))
+        atributos[:, feature_id] = rng.uniform(
+            FEATURE_MIN,
+            FEATURE_MAX,
+            size=len(atributos),
+        )
+    elif behavior_id == 3:
+        rotulos = 1 - rotulos
+
+    model = LogisticRegression(max_iter=1000, random_state=42)
+    model.fit(atributos, rotulos)
+    resposta_agregacao = client.submit_model_update(model)
+
+    return {
+        'client_id': client_id,
+        'behavior_id': behavior_id,
+        'samples': len(resposta.samples),
+        'accepted': resposta_agregacao.accepted,
+        'acc_with_detection': resposta_agregacao.global_acc,
+        'acc_without_detection': resposta_agregacao.global_acc_without_detection,
+    }
+
+
 if __name__ == '__main__':
-    client   = ExemploGRPC()
-    from sklearn.datasets import load_iris
-    from sklearn.model_selection import train_test_split
+    if len(sys.argv) != 3:
+        raise SystemExit(
+            f'uso: python mlcliente.py <client_id: 0-{NUM_CLIENTS - 1}> '
+            '<behavior_id: 0-3>'
+        )
 
-    iris      = load_iris()
-    atributos = iris.data
-    rotulos   = iris.target
-    x_treino, x_teste, y_treino, y_test = train_test_split(atributos, rotulos, test_size=0.2)
-
-    
-    while True:
-        action = int(input(f'Qual ação você quer realizar?\n 1. Treinar modelo\n 2. Obter predição\n'))
-        if action == 1:
-            resposta = client.get_fit(x_treino, y_treino)
-            print(f'Acurácia em teste: {resposta.acc}')
-        elif action == 2:
-            resposta = client.get_predict(x_teste, y_test)
-            print(f'Rotulos: {resposta.predictions}')
-            print(f'Acurácia em teste: {resposta.acc}')
+    result = executar_cliente(int(sys.argv[1]), int(sys.argv[2]))
+    print(
+        f"Cliente {result['client_id']} ({BEHAVIOR_NAMES[result['behavior_id']]}): "
+        f"{result['samples']} amostras locais; "
+        f"update aceito={result['accepted']}; "
+        f"acurácia com detecção={result['acc_with_detection']:.4f}; "
+        f"acurácia sem detecção={result['acc_without_detection']:.4f}"
+    )
