@@ -39,10 +39,10 @@ class MLStub:
                 request_serializer=ml__pb2.TrainingDataRequest.SerializeToString,
                 response_deserializer=ml__pb2.TrainingDataResponse.FromString,
                 _registered_method=True)
-        self.SubmitModelUpdate = channel.unary_unary(
-                '/mlrpc.ML/SubmitModelUpdate',
-                request_serializer=ml__pb2.ModelUpdateRequest.SerializeToString,
-                response_deserializer=ml__pb2.ModelUpdateResponse.FromString,
+        self.SubmitDataUpdate = channel.unary_unary(
+                '/mlrpc.ML/SubmitDataUpdate',
+                request_serializer=ml__pb2.DataUpdateRequest.SerializeToString,
+                response_deserializer=ml__pb2.DataUpdateResponse.FromString,
                 _registered_method=True)
         self.GetFit = channel.unary_unary(
                 '/mlrpc.ML/GetFit',
@@ -65,7 +65,7 @@ class MLServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def SubmitModelUpdate(self, request, context):
+    def SubmitDataUpdate(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -91,10 +91,10 @@ def add_MLServicer_to_server(servicer, server):
                     request_deserializer=ml__pb2.TrainingDataRequest.FromString,
                     response_serializer=ml__pb2.TrainingDataResponse.SerializeToString,
             ),
-            'SubmitModelUpdate': grpc.unary_unary_rpc_method_handler(
-                    servicer.SubmitModelUpdate,
-                    request_deserializer=ml__pb2.ModelUpdateRequest.FromString,
-                    response_serializer=ml__pb2.ModelUpdateResponse.SerializeToString,
+            'SubmitDataUpdate': grpc.unary_unary_rpc_method_handler(
+                    servicer.SubmitDataUpdate,
+                    request_deserializer=ml__pb2.DataUpdateRequest.FromString,
+                    response_serializer=ml__pb2.DataUpdateResponse.SerializeToString,
             ),
             'GetFit': grpc.unary_unary_rpc_method_handler(
                     servicer.GetFit,
@@ -145,7 +145,7 @@ class ML:
             _registered_method=True)
 
     @staticmethod
-    def SubmitModelUpdate(request,
+    def SubmitDataUpdate(request,
             target,
             options=(),
             channel_credentials=None,
@@ -158,9 +158,9 @@ class ML:
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/mlrpc.ML/SubmitModelUpdate',
-            ml__pb2.ModelUpdateRequest.SerializeToString,
-            ml__pb2.ModelUpdateResponse.FromString,
+            '/mlrpc.ML/SubmitDataUpdate',
+            ml__pb2.DataUpdateRequest.SerializeToString,
+            ml__pb2.DataUpdateResponse.FromString,
             options,
             channel_credentials,
             insecure,

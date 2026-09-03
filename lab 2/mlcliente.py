@@ -2,7 +2,6 @@ import sys
 
 import grpc
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 
 import ml_pb2 as pb2
 import ml_pb2_grpc as pb2_grpc
@@ -15,7 +14,7 @@ FEATURE_MAX = 16.0
 BEHAVIOR_NAMES = {
     0: 'normal',
     1: 'ruído em todas as features',
-    2: 'ruído em uma feature',
+    2: 'ruído nas últimas 8 features',
     3: 'rótulos invertidos',
 }
 
@@ -30,13 +29,16 @@ class Cliente:
         request = pb2.TrainingDataRequest(client_id=self.client_id)
         return self.stub.GetTrainingData(request)
 
-    def submit_model_update(self, model):
-        request = pb2.ModelUpdateRequest(
+    def submit_data_update(self, atributos, rotulos):
+        samples = [
+            pb2.Sample(data=data, label=label)
+            for data, label in zip(atributos, rotulos)
+        ]
+        request = pb2.DataUpdateRequest(
             client_id=self.client_id,
-            weights=model.coef_.ravel().tolist(),
-            intercept=model.intercept_.tolist(),
+            samples=samples,
         )
-        return self.stub.SubmitModelUpdate(request)
+        return self.stub.SubmitDataUpdate(request)
 
 
 def executar_cliente(client_id, behavior_id):
@@ -58,24 +60,22 @@ def executar_cliente(client_id, behavior_id):
             size=atributos.shape,
         )
     elif behavior_id == 2:
-        feature_id = int(rng.integers(atributos.shape[1]))
-        atributos[:, feature_id] = rng.uniform(
+        atributos[:, -8:] = rng.uniform(
             FEATURE_MIN,
             FEATURE_MAX,
-            size=len(atributos),
+            size=(len(atributos), 8),
         )
     elif behavior_id == 3:
         rotulos = 1 - rotulos
 
-    model = LogisticRegression(max_iter=1000, random_state=42)
-    model.fit(atributos, rotulos)
-    resposta_agregacao = client.submit_model_update(model)
+    resposta_agregacao = client.submit_data_update(atributos, rotulos)
 
     return {
         'client_id': client_id,
         'behavior_id': behavior_id,
         'samples': len(resposta.samples),
         'accepted': resposta_agregacao.accepted,
+        'client_acc': resposta_agregacao.client_acc,
         'acc_with_detection': resposta_agregacao.global_acc,
         'acc_without_detection': resposta_agregacao.global_acc_without_detection,
     }
@@ -92,6 +92,7 @@ if __name__ == '__main__':
     print(
         f"Cliente {result['client_id']} ({BEHAVIOR_NAMES[result['behavior_id']]}): "
         f"{result['samples']} amostras locais; "
+        f"acurácia individual={result['client_acc']:.4f}; "
         f"update aceito={result['accepted']}; "
         f"acurácia com detecção={result['acc_with_detection']:.4f}; "
         f"acurácia sem detecção={result['acc_without_detection']:.4f}"

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x08ml.proto\x12\x05mlrpc\"%\n\x06Sample\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x02\x12\r\n\x05label\x18\x02 \x01(\x05\",\n\nFitRequest\x12\x1e\n\x07samples\x18\x01 \x03(\x0b\x32\r.mlrpc.Sample\"(\n\x13TrainingDataRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\"6\n\x14TrainingDataResponse\x12\x1e\n\x07samples\x18\x01 \x03(\x0b\x32\r.mlrpc.Sample\"K\n\x12ModelUpdateRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\x12\x0f\n\x07weights\x18\x02 \x03(\x02\x12\x11\n\tintercept\x18\x03 \x03(\x02\"a\n\x13ModelUpdateResponse\x12\x10\n\x08\x61\x63\x63\x65pted\x18\x01 \x01(\x08\x12\x12\n\nglobal_acc\x18\x02 \x01(\x02\x12$\n\x1cglobal_acc_without_detection\x18\x03 \x01(\x02\"\x1a\n\x0b\x46itResponse\x12\x0b\n\x03\x61\x63\x63\x18\x01 \x01(\x02\"0\n\x0ePredictRequest\x12\x1e\n\x07samples\x18\x01 \x03(\x0b\x32\r.mlrpc.Sample\"3\n\x0fPredictResponse\x12\x13\n\x0bpredictions\x18\x01 \x03(\x05\x12\x0b\n\x03\x61\x63\x63\x18\x02 \x01(\x02\x32\x92\x02\n\x02ML\x12L\n\x0fGetTrainingData\x12\x1a.mlrpc.TrainingDataRequest\x1a\x1b.mlrpc.TrainingDataResponse\"\x00\x12L\n\x11SubmitModelUpdate\x12\x19.mlrpc.ModelUpdateRequest\x1a\x1a.mlrpc.ModelUpdateResponse\"\x00\x12\x31\n\x06GetFit\x12\x11.mlrpc.FitRequest\x1a\x12.mlrpc.FitResponse\"\x00\x12=\n\nGetPredict\x12\x15.mlrpc.PredictRequest\x1a\x16.mlrpc.PredictResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x08ml.proto\x12\x05mlrpc\"%\n\x06Sample\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x02\x12\r\n\x05label\x18\x02 \x01(\x05\",\n\nFitRequest\x12\x1e\n\x07samples\x18\x01 \x03(\x0b\x32\r.mlrpc.Sample\"(\n\x13TrainingDataRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\"6\n\x14TrainingDataResponse\x12\x1e\n\x07samples\x18\x01 \x03(\x0b\x32\r.mlrpc.Sample\"F\n\x11\x44\x61taUpdateRequest\x12\x11\n\tclient_id\x18\x01 \x01(\x05\x12\x1e\n\x07samples\x18\x02 \x03(\x0b\x32\r.mlrpc.Sample\"t\n\x12\x44\x61taUpdateResponse\x12\x10\n\x08\x61\x63\x63\x65pted\x18\x01 \x01(\x08\x12\x12\n\nglobal_acc\x18\x02 \x01(\x02\x12$\n\x1cglobal_acc_without_detection\x18\x03 \x01(\x02\x12\x12\n\nclient_acc\x18\x04 \x01(\x02\"\x1a\n\x0b\x46itResponse\x12\x0b\n\x03\x61\x63\x63\x18\x01 \x01(\x02\"0\n\x0ePredictRequest\x12\x1e\n\x07samples\x18\x01 \x03(\x0b\x32\r.mlrpc.Sample\"3\n\x0fPredictResponse\x12\x13\n\x0bpredictions\x18\x01 \x03(\x05\x12\x0b\n\x03\x61\x63\x63\x18\x02 \x01(\x02\x32\x8f\x02\n\x02ML\x12L\n\x0fGetTrainingData\x12\x1a.mlrpc.TrainingDataRequest\x1a\x1b.mlrpc.TrainingDataResponse\"\x00\x12I\n\x10SubmitDataUpdate\x12\x18.mlrpc.DataUpdateRequest\x1a\x19.mlrpc.DataUpdateResponse\"\x00\x12\x31\n\x06GetFit\x12\x11.mlrpc.FitRequest\x1a\x12.mlrpc.FitResponse\"\x00\x12=\n\nGetPredict\x12\x15.mlrpc.PredictRequest\x1a\x16.mlrpc.PredictResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,16 +39,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_TRAININGDATAREQUEST']._serialized_end=144
   _globals['_TRAININGDATARESPONSE']._serialized_start=146
   _globals['_TRAININGDATARESPONSE']._serialized_end=200
-  _globals['_MODELUPDATEREQUEST']._serialized_start=202
-  _globals['_MODELUPDATEREQUEST']._serialized_end=277
-  _globals['_MODELUPDATERESPONSE']._serialized_start=279
-  _globals['_MODELUPDATERESPONSE']._serialized_end=376
-  _globals['_FITRESPONSE']._serialized_start=378
-  _globals['_FITRESPONSE']._serialized_end=404
-  _globals['_PREDICTREQUEST']._serialized_start=406
-  _globals['_PREDICTREQUEST']._serialized_end=454
-  _globals['_PREDICTRESPONSE']._serialized_start=456
-  _globals['_PREDICTRESPONSE']._serialized_end=507
-  _globals['_ML']._serialized_start=510
-  _globals['_ML']._serialized_end=784
+  _globals['_DATAUPDATEREQUEST']._serialized_start=202
+  _globals['_DATAUPDATEREQUEST']._serialized_end=272
+  _globals['_DATAUPDATERESPONSE']._serialized_start=274
+  _globals['_DATAUPDATERESPONSE']._serialized_end=390
+  _globals['_FITRESPONSE']._serialized_start=392
+  _globals['_FITRESPONSE']._serialized_end=418
+  _globals['_PREDICTREQUEST']._serialized_start=420
+  _globals['_PREDICTREQUEST']._serialized_end=468
+  _globals['_PREDICTRESPONSE']._serialized_start=470
+  _globals['_PREDICTRESPONSE']._serialized_end=521
+  _globals['_ML']._serialized_start=524
+  _globals['_ML']._serialized_end=795
 # @@protoc_insertion_point(module_scope)

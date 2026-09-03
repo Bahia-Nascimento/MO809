@@ -18,7 +18,7 @@ MARKDOWN_PATH = OUTPUT_DIR / 'relatorio_experimentos.md'
 
 BEHAVIOR_NAMES = {
     1: 'ruido em todas as features',
-    2: 'ruido em uma feature',
+    2: 'ruido nas ultimas 8 features',
     3: 'rotulos invertidos',
 }
 
@@ -65,6 +65,7 @@ def run_scenario(behavior_id, malicious_count):
                 ray.kill(actor)
 
         accepted = [result['accepted'] for result in results]
+        client_accuracies = [result['client_acc'] for result in sorted(results, key=lambda item: item['client_id'])]
         acc_with_detection = float(results[0]['acc_with_detection'])
         acc_without_detection = float(results[0]['acc_without_detection'])
 
@@ -74,6 +75,7 @@ def run_scenario(behavior_id, malicious_count):
             'clientes_bizantinos': malicious_count,
             'clientes_aceitos': sum(accepted),
             'clientes_rejeitados': NUM_CLIENTS - sum(accepted),
+            'acuracias_individuais': ';'.join(f'{accuracy:.4f}' for accuracy in client_accuracies),
             'acuracia_com_deteccao': acc_with_detection,
             'acuracia_sem_deteccao': acc_without_detection,
         }
@@ -96,6 +98,7 @@ def main():
         'clientes_bizantinos',
         'clientes_aceitos',
         'clientes_rejeitados',
+        'acuracias_individuais',
         'acuracia_com_deteccao',
         'acuracia_sem_deteccao',
     ]
@@ -130,7 +133,7 @@ def main():
 
 def write_markdown_report(rows):
     lines = [
-        '# Relatório de Experimentos Federados',
+        '# Relatório de Experimentos Cliente-Servidor',
         '',
         '## Configuração',
         '',
@@ -138,18 +141,19 @@ def write_markdown_report(rows):
         '- Clientes por cenário: 5.',
         '- Cenários: 1, 2 e 3 clientes bizantinos para cada tipo de ataque.',
         '- Critério de aceitação: acurácia no teste maior que `0.5` (chute aleatório).',
-        '- Agregação: média dos pesos dos modelos aceitos.',
+        '- Treinamento final realizado no servidor com os dados recebidos.',
         '',
         '## Resultados',
         '',
-        '| Tipo de ataque | Bizantinos | Aceitos | Rejeitados | Com detecção | Sem detecção |',
-        '|---|---:|---:|---:|---:|---:|',
+        '| Tipo de ataque | Bizantinos | Aceitos | Rejeitados | Acurácias individuais (clientes 0-4) | Com detecção | Sem detecção |',
+        '|---|---:|---:|---:|---|---:|---:|',
     ]
 
     for row in rows:
         lines.append(
             f"| {row['tipo_bizantino']} | {row['clientes_bizantinos']} | "
             f"{row['clientes_aceitos']} | {row['clientes_rejeitados']} | "
+            f"{row['acuracias_individuais']} | "
             f"{float(row['acuracia_com_deteccao']):.4f} | "
             f"{float(row['acuracia_sem_deteccao']):.4f} |"
         )
@@ -158,8 +162,8 @@ def write_markdown_report(rows):
         '',
         '## Observação',
         '',
-        'A comparação mostra o desempenho do modelo final após a filtragem dos updates '
-        'em relação à agregação de todos os modelos recebidos.',
+        'A comparação mostra o desempenho do modelo final após a filtragem dos clientes '
+        'em relação ao treinamento usando todos os dados recebidos.',
         '',
     ])
     MARKDOWN_PATH.write_text('\n'.join(lines), encoding='utf-8')

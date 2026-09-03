@@ -4,7 +4,7 @@ from concurrent import futures
 import grpc
 import numpy as np
 from sklearn.datasets import load_digits
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 import ml_pb2 as pb2
@@ -12,8 +12,6 @@ import ml_pb2_grpc as pb2_grpc
 
 
 NUM_CLIENTS = 5
-MODEL = LogisticRegression(max_iter=1000, random_state=42)
-
 DIGITS = load_digits()
 X_TREINO, X_TESTE, Y_TREINO, Y_TESTE = train_test_split(
     DIGITS.data,
@@ -27,7 +25,7 @@ X_TREINO, X_TESTE, Y_TREINO, Y_TESTE = train_test_split(
 class ExemploServer(pb2_grpc.MLServicer):
     def __init__(self):
         self.condition = threading.Condition()
-        self.updates = {}
+        self.client_data = {}
         self.results = {}
 
     def GetTrainingData(self, request, context):
@@ -42,85 +40,89 @@ class ExemploServer(pb2_grpc.MLServicer):
         ]
         return pb2.TrainingDataResponse(samples=samples)
 
-    def SubmitModelUpdate(self, request, context):
+    def SubmitDataUpdate(self, request, context):
         client_id = request.client_id
         if not 0 <= client_id < NUM_CLIENTS:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'client_id inválido')
 
-        update = (
-            np.asarray(request.weights, dtype=np.float64),
-            np.asarray(request.intercept, dtype=np.float64),
-        )
+        data = np.asarray([sample.data for sample in request.samples], dtype=np.float64)
+        labels = np.asarray([sample.label for sample in request.samples], dtype=np.int64)
 
         with self.condition:
-            if client_id in self.updates:
-                context.abort(grpc.StatusCode.ALREADY_EXISTS, 'cliente já enviou atualização')
+            if client_id in self.client_data:
+                context.abort(grpc.StatusCode.ALREADY_EXISTS, 'cliente já enviou dados')
 
-            self.updates[client_id] = update
-            if len(self.updates) == NUM_CLIENTS:
+            self.client_data[client_id] = (data, labels)
+            if len(self.client_data) == NUM_CLIENTS:
                 self._process_updates()
                 self.condition.notify_all()
             else:
                 self.condition.wait_for(lambda: len(self.results) == NUM_CLIENTS)
 
-            accepted, accuracy, accuracy_without_detection = self.results[client_id]
-            return pb2.ModelUpdateResponse(
+            accepted, client_accuracy, accuracy, accuracy_without_detection = self.results[client_id]
+            return pb2.DataUpdateResponse(
                 accepted=accepted,
                 global_acc=accuracy,
                 global_acc_without_detection=accuracy_without_detection,
+                client_acc=client_accuracy,
             )
 
-    def _process_updates(self):
-        client_ids = sorted(self.updates)
-        weights = np.stack([self.updates[client_id][0] for client_id in client_ids])
-        intercepts = np.stack([self.updates[client_id][1] for client_id in client_ids])
+    def _new_model(self):
+        return RandomForestClassifier(
+            n_estimators=200,
+            random_state=42,
+            n_jobs=-1,
+        )
 
-        MODEL.fit(X_TREINO, Y_TREINO)
+    def _process_updates(self):
+        client_ids = sorted(self.client_data)
         client_accuracies = []
-        for client_weights, client_intercept in zip(weights, intercepts):
-            client_model = LogisticRegression(max_iter=1000, random_state=42)
-            client_model.fit(X_TREINO, Y_TREINO)
-            client_model.coef_ = client_weights.reshape(client_model.coef_.shape)
-            client_model.intercept_ = client_intercept
+        for client_id in client_ids:
+            data, labels = self.client_data[client_id]
+            client_model = self._new_model()
+            client_model.fit(data, labels)
             client_accuracies.append(client_model.score(X_TESTE, Y_TESTE))
 
         random_accuracy = 1 / len(np.unique(Y_TESTE))
         accepted_mask = np.asarray(client_accuracies) > random_accuracy
-
         if not np.any(accepted_mask):
-            raise RuntimeError('nenhum modelo superou a acurácia de um chute aleatório')
+            raise RuntimeError('nenhum cliente superou a acurácia de um chute aleatório')
 
-        all_weights = np.mean(weights, axis=0).reshape(MODEL.coef_.shape)
-        all_intercept = np.mean(intercepts, axis=0)
-        accuracy_without_detection = self._score_parameters(all_weights, all_intercept)
+        all_data = np.concatenate([self.client_data[client_id][0] for client_id in client_ids])
+        all_labels = np.concatenate([self.client_data[client_id][1] for client_id in client_ids])
+        model_without_detection = self._new_model()
+        model_without_detection.fit(all_data, all_labels)
+        accuracy_without_detection = float(model_without_detection.score(X_TESTE, Y_TESTE))
 
-        MODEL.coef_ = np.mean(weights[accepted_mask], axis=0).reshape(MODEL.coef_.shape)
-        MODEL.intercept_ = np.mean(intercepts[accepted_mask], axis=0)
-        accuracy = float(MODEL.score(X_TESTE, Y_TESTE))
+        accepted_ids = [client_id for client_id, accepted in zip(client_ids, accepted_mask) if accepted]
+        accepted_data = np.concatenate([self.client_data[client_id][0] for client_id in accepted_ids])
+        accepted_labels = np.concatenate([self.client_data[client_id][1] for client_id in accepted_ids])
+        model_with_detection = self._new_model()
+        model_with_detection.fit(accepted_data, accepted_labels)
+        accuracy = float(model_with_detection.score(X_TESTE, Y_TESTE))
 
         self.results = {
-            client_id: (bool(accepted), accuracy, accuracy_without_detection)
-            for client_id, accepted in zip(client_ids, accepted_mask)
+            client_id: (
+                bool(accepted),
+                float(client_accuracy),
+                accuracy,
+                accuracy_without_detection,
+            )
+            for client_id, accepted, client_accuracy in zip(
+                client_ids,
+                accepted_mask,
+                client_accuracies,
+            )
         }
-
-    def _score_parameters(self, weights, intercept):
-        model = LogisticRegression(max_iter=1000, random_state=42)
-        model.fit(X_TREINO, Y_TREINO)
-        model.coef_ = weights
-        model.intercept_ = intercept
-        return float(model.score(X_TESTE, Y_TESTE))
 
     def GetFit(self, request, context):
         context.abort(
             grpc.StatusCode.UNIMPLEMENTED,
-            'O treinamento agora acontece localmente nos clientes',
+            'Use SubmitDataUpdate: o treinamento é realizado no servidor',
         )
 
     def GetPredict(self, request, context):
-        context.abort(
-            grpc.StatusCode.UNIMPLEMENTED,
-            'A agregação federada ainda não disponibiliza predição',
-        )
+        context.abort(grpc.StatusCode.UNIMPLEMENTED, 'Predição ainda não implementada')
 
 
 def serve():
