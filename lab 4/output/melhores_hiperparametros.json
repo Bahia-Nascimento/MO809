@@ -1,0 +1,9 @@
+{
+  "filtros_1": 32,
+  "filtros_2": 32,
+  "unidades_densas": 128,
+  "dimensao_embedding": 16,
+  "dropout": 0.0,
+  "batch_normalization": false,
+  "learning_rate": 0.001
+}

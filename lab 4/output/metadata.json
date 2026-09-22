@@ -1,0 +1,74 @@
+{
+  "model_id": "c7ca48a2fe858020e8e72aad2cebb80bb495fac10bd6f2dcb516eabedda00add",
+  "dimensao": 16,
+  "limiar": 0.5374093055725098,
+  "margem": 1.0,
+  "convencao": "1=mesma classe; 0=classes diferentes",
+  "hiperparametros": {
+    "filtros_1": 32,
+    "filtros_2": 32,
+    "unidades_densas": 128,
+    "dimensao_embedding": 16,
+    "dropout": 0.0,
+    "batch_normalization": false,
+    "learning_rate": 0.001
+  },
+  "acuracia_validacao": 0.9365,
+  "selecao": {
+    "selecionado": "retreino",
+    "trial_vencedor": "17",
+    "loss_checkpoint_busca": 0.061292290687561035,
+    "loss_retreino": 0.06078525632619858,
+    "loss_validacao": 0.06078525632619858,
+    "loss_treino_inferencia": 0.03381732478737831,
+    "loss_validacao_referencia": 0.06216100603342056,
+    "loss_treino_referencia_inferencia": 0.03655179962515831
+  },
+  "loss_validacao": 0.06078525632619858,
+  "acuracia_teste": 0.9267,
+  "matriz_confusao_teste": [
+    [
+      4617,
+      383
+    ],
+    [
+      350,
+      4650
+    ]
+  ],
+  "loss_teste": 0.06451323628425598,
+  "imagens": {
+    "treino": 48000,
+    "validacao": 12000,
+    "teste": 10000
+  },
+  "pares": {
+    "treino": 30000,
+    "validacao": 6000,
+    "teste": 10000
+  },
+  "epocas_executadas": 17,
+  "melhor_epoca": 12,
+  "configuracao": {
+    "output": "output/busca_ampliada_20260922",
+    "trials": 24,
+    "epocas_busca": 20,
+    "epocas": 30,
+    "pares_treino": 30000,
+    "pares_validacao": 6000,
+    "pares_teste": 10000,
+    "batch_size": 128,
+    "seed": 42,
+    "cpu": false,
+    "paciencia": 5,
+    "referencia": "output"
+  },
+  "python": "3.9.5",
+  "tensorflow": "2.20.0",
+  "keras": "3.10.0",
+  "keras_tuner": "1.4.8",
+  "gpu": [
+    "NVIDIA GeForce RTX 3050 6GB Laptop GPU"
+  ],
+  "segundos": 1577.786413686
+}

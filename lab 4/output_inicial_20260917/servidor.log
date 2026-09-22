@@ -1,0 +1,12 @@
+2026-09-17 15:57:33.891552: E external/local_xla/xla/stream_executor/cuda/cuda_platform.cc:51] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+Servidor pronto em 127.0.0.1:43721
+Rodada 46248afdb4e142388a368972779ee5a6-0: distância=0.888097, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-1: distância=0.975426, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-2: distância=1.170656, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-3: distância=1.305072, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-4: distância=0.513078, similares=True
+Rodada 46248afdb4e142388a368972779ee5a6-5: distância=1.061511, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-6: distância=1.256132, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-7: distância=0.711281, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-8: distância=0.722486, similares=False
+Rodada 46248afdb4e142388a368972779ee5a6-9: distância=1.437739, similares=False

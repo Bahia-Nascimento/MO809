@@ -1,0 +1,28 @@
+syntax = "proto3";
+package lab4;
+
+// gRPC transporta mensagens Protobuf. Nenhuma imagem ou classe é enviada.
+service Similaridade {
+  rpc GetInfo(Vazio) returns (Info);
+  rpc EnviarVetor(VetorRequest) returns (Resultado);
+}
+message Vazio {}
+message Info {
+  string model_id = 1;
+  int32 dimensao = 2;
+  double limiar = 3;
+  string instance_id = 4;
+}
+message VetorRequest {
+  string client_id = 1;
+  string rodada = 2;
+  string model_id = 3;
+  repeated float valores = 4;
+}
+message Resultado {
+  string rodada = 1;
+  double distancia = 2;
+  bool similares = 3;
+  double limiar = 4;
+  repeated string clientes = 5;
+}

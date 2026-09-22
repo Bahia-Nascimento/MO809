@@ -1,0 +1,9 @@
+{
+  "loss_validacao_anterior": 0.06216100603342056,
+  "loss_validacao_nova": 0.06078525632619858,
+  "reducao_relativa": 0.0221320373496259,
+  "mesmos_indices_e_pares": true,
+  "criterio_selecao": "menor Contrastive Loss de validacao; teste so apos selecao",
+  "referencia": "/home/bahia/MO809/lab 4/output",
+  "nova": "/home/bahia/MO809/lab 4/output/busca_ampliada_20260922"
+}

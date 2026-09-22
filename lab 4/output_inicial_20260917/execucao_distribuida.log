@@ -1,0 +1,12 @@
+2026-09-17 15:57:35,611	INFO worker.py:1951 -- Started a local Ray instance.
+Rodada 0: classes 9/8, D=0.8881, similares=False, acerto=True
+Rodada 1: classes 0/8, D=0.9754, similares=False, acerto=True
+Rodada 2: classes 8/0, D=1.1707, similares=False, acerto=True
+Rodada 3: classes 9/6, D=1.3051, similares=False, acerto=True
+Rodada 4: classes 7/9, D=0.5131, similares=True, acerto=False
+Rodada 5: classes 5/1, D=1.0615, similares=False, acerto=True
+Rodada 6: classes 0/8, D=1.2561, similares=False, acerto=True
+Rodada 7: classes 7/9, D=0.7113, similares=False, acerto=True
+Rodada 8: classes 2/4, D=0.7225, similares=False, acerto=True
+Rodada 9: classes 1/8, D=1.4377, similares=False, acerto=True
+Resultados em /home/bahia/MO809/lab 4/output/experimento.md

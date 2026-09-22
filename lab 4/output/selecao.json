@@ -1,0 +1,10 @@
+{
+  "selecionado": "retreino",
+  "trial_vencedor": "17",
+  "loss_checkpoint_busca": 0.061292290687561035,
+  "loss_retreino": 0.06078525632619858,
+  "loss_validacao": 0.06078525632619858,
+  "loss_treino_inferencia": 0.03381732478737831,
+  "loss_validacao_referencia": 0.06216100603342056,
+  "loss_treino_referencia_inferencia": 0.03655179962515831
+}
