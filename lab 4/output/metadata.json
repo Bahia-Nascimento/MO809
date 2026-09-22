@@ -20,9 +20,7 @@
     "loss_checkpoint_busca": 0.061292290687561035,
     "loss_retreino": 0.06078525632619858,
     "loss_validacao": 0.06078525632619858,
-    "loss_treino_inferencia": 0.03381732478737831,
-    "loss_validacao_referencia": 0.06216100603342056,
-    "loss_treino_referencia_inferencia": 0.03655179962515831
+    "loss_treino_inferencia": 0.03381732478737831
   },
   "loss_validacao": 0.06078525632619858,
   "acuracia_teste": 0.9267,
@@ -50,7 +48,7 @@
   "epocas_executadas": 17,
   "melhor_epoca": 12,
   "configuracao": {
-    "output": "output/busca_ampliada_20260922",
+    "output": "output",
     "trials": 24,
     "epocas_busca": 20,
     "epocas": 30,
@@ -60,8 +58,7 @@
     "batch_size": 128,
     "seed": 42,
     "cpu": false,
-    "paciencia": 5,
-    "referencia": "output"
+    "paciencia": 5
   },
   "python": "3.9.5",
   "tensorflow": "2.20.0",

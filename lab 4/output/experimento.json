@@ -4,7 +4,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 892,
         "classe": 9,
         "vetor": [
@@ -25,14 +25,14 @@
           0.41848164796829224,
           0.07220800220966339
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-0",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-0",
         "distancia": 0.8112891316413879,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 5053,
         "classe": 8,
         "vetor": [
@@ -53,7 +53,7 @@
           0.17659606039524078,
           0.13559474050998688
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-0",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-0",
         "distancia": 0.8112891316413879,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -68,7 +68,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 7739,
         "classe": 0,
         "vetor": [
@@ -89,14 +89,14 @@
           -0.16094428300857544,
           -0.09591993689537048
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-1",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-1",
         "distancia": 0.8563455939292908,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 6522,
         "classe": 8,
         "vetor": [
@@ -117,7 +117,7 @@
           0.05448766425251961,
           0.18839465081691742
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-1",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-1",
         "distancia": 0.8563455939292908,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -132,7 +132,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 6545,
         "classe": 8,
         "vetor": [
@@ -153,14 +153,14 @@
           0.054574206471443176,
           0.1979234516620636
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-2",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-2",
         "distancia": 0.9357510209083557,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 4013,
         "classe": 0,
         "vetor": [
@@ -181,7 +181,7 @@
           -0.2771717309951782,
           -0.024912025779485703
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-2",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-2",
         "distancia": 0.9357510209083557,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -196,7 +196,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 4388,
         "classe": 9,
         "vetor": [
@@ -217,14 +217,14 @@
           0.45376965403556824,
           0.014169739559292793
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-3",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-3",
         "distancia": 1.3604061603546143,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 437,
         "classe": 6,
         "vetor": [
@@ -245,7 +245,7 @@
           -0.07123156636953354,
           -0.14055174589157104
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-3",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-3",
         "distancia": 1.3604061603546143,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -260,7 +260,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 4330,
         "classe": 7,
         "vetor": [
@@ -281,14 +281,14 @@
           0.3591311573982239,
           -0.1335798054933548
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-4",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-4",
         "distancia": 0.7140788435935974,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 5771,
         "classe": 9,
         "vetor": [
@@ -309,7 +309,7 @@
           0.4514051675796509,
           0.11779133230447769
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-4",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-4",
         "distancia": 0.7140788435935974,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -324,7 +324,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 8585,
         "classe": 5,
         "vetor": [
@@ -345,14 +345,14 @@
           0.23378922045230865,
           -0.2661592364311218
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-5",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-5",
         "distancia": 1.2114812135696411,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 200,
         "classe": 1,
         "vetor": [
@@ -373,7 +373,7 @@
           -0.11072368174791336,
           -0.17373724281787872
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-5",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-5",
         "distancia": 1.2114812135696411,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -388,7 +388,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 859,
         "classe": 0,
         "vetor": [
@@ -409,14 +409,14 @@
           -0.2537451982498169,
           -0.002014093566685915
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-6",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-6",
         "distancia": 1.1857675313949585,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 2765,
         "classe": 8,
         "vetor": [
@@ -437,7 +437,7 @@
           0.0977882668375969,
           0.256846159696579
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-6",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-6",
         "distancia": 1.1857675313949585,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -452,7 +452,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 6973,
         "classe": 7,
         "vetor": [
@@ -473,14 +473,14 @@
           0.46224793791770935,
           -0.14519937336444855
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-7",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-7",
         "distancia": 0.7757506966590881,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 8392,
         "classe": 9,
         "vetor": [
@@ -501,7 +501,7 @@
           0.44067510962486267,
           0.07655758410692215
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-7",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-7",
         "distancia": 0.7757506966590881,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -516,7 +516,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 2014,
         "classe": 2,
         "vetor": [
@@ -537,14 +537,14 @@
           -0.14000675082206726,
           -0.3138093948364258
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-8",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-8",
         "distancia": 0.6758260726928711,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 4644,
         "classe": 4,
         "vetor": [
@@ -565,7 +565,7 @@
           0.08054158091545105,
           -0.2048998475074768
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-8",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-8",
         "distancia": 0.6758260726928711,
         "similares": false,
         "limiar": 0.5374093055725098
@@ -580,7 +580,7 @@
     "clientes": [
       {
         "client_id": 0,
-        "pid": 24721,
+        "pid": 45797,
         "indice": 941,
         "classe": 1,
         "vetor": [
@@ -601,14 +601,14 @@
           -0.11777038872241974,
           -0.1913985311985016
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-9",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-9",
         "distancia": 1.4023041725158691,
         "similares": false,
         "limiar": 0.5374093055725098
       },
       {
         "client_id": 1,
-        "pid": 24722,
+        "pid": 45796,
         "indice": 5871,
         "classe": 8,
         "vetor": [
@@ -629,7 +629,7 @@
           0.034326519817113876,
           0.15161998569965363
         ],
-        "rodada": "434a72c51fc14c57aa2ea3780901054e-9",
+        "rodada": "d78fbb13ceae4e05a82d71a242028ee0-9",
         "distancia": 1.4023041725158691,
         "similares": false,
         "limiar": 0.5374093055725098

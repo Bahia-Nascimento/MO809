@@ -13,12 +13,9 @@ diretamente em [`output/`](output/README.md).
 
 ```bash
 python experimento.py
-# Nova busca em outro diretório, verificando igualdade dos pares com o resultado oficial:
-python treinar.py --output output/repeticao_ampliada --referencia output
+# Nova busca em outro diretório, preservando o resultado oficial:
+python treinar.py --output output/nova_execucao
 ```
-
-A execução inicial foi preservada em `output_inicial_20260917/` para permitir a
-comparação reproduzível. Ela não é carregada pelos comandos padrão.
 
 ## Comece aqui
 
@@ -32,7 +29,8 @@ python experimento.py
 
 Os modelos já treinados estão em `output/`. Esse comando inicia o servidor e os dois
 clientes, executa 10 pares aleatórios e encerra os processos que iniciou.
-Os resultados ficam em `output/experimento.md` e `output/experimento.json`.
+Os resultados estruturados ficam em `output/experimento.json`; o resumo da entrega,
+as métricas e as figuras ficam em `output/README.md`.
 
 Para refazer **a busca e o treinamento**, preservando a execução entregue:
 
@@ -99,7 +97,6 @@ as duas chamadas antes de aguardar, pois o servidor precisa dos dois vetores.
 | `experimento.py` | Iniciar servidor e clientes Ray e conferir as respostas |
 | `config.py` | Caminhos, configuração de CPU/GPU e identificação do modelo |
 | `test_lab4.py` | Testes matemáticos, BN, serialização e chamadas gRPC reais |
-| `comparar_buscas.py` | Relatório e gráfico de comparação com a referência |
 
 `ml_pb2.py` e `ml_pb2_grpc.py` são **gerados automaticamente**, não escritos à mão.
 Se modificar `ml.proto`, regenere-os no WSL:
@@ -226,7 +223,7 @@ diferentes. Rodadas impedem misturar pares concorrentes. O primeiro RPC espera c
 por até cerca de 5 minutos (limpeza em novas requisições), permitindo reenvio idêntico;
 reenviar outro vetor para o mesmo cliente/rodada é erro. Não há retry automático.
 
-No JSON do experimento, rótulos e índices aparecem apenas para conferir os resultados
+No resultado do experimento, rótulos e índices aparecem apenas para conferir os resultados
 localmente. Eles **não são enviados ao servidor gRPC**. Os embeddings continuam sendo
 representações dos dados; enviar vetores não oferece, por si só, garantia de privacidade.
 
@@ -246,5 +243,5 @@ O experimento também verifica PIDs distintos e igualdade entre a distância rec
 e a calculada diretamente dos vetores enviados.
 
 Resultados medidos, gráficos e limitações estão em [output/README.md](output/README.md).
-As sementes, índices dos pares e versões foram salvos. Pequenas diferenças numéricas
+As sementes, configurações e versões foram salvas. Pequenas diferenças numéricas
 podem ocorrer entre GPU/CPU e versões das bibliotecas. Não há garantia bit a bit.

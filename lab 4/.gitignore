@@ -1,12 +1,5 @@
 __pycache__/
-output/*.keras
-output/*.npz
+*.py[cod]
 output/*.log
 output/smoke/
 output/tuner/
-
-# Artefatos pesados também nas novas execuções.
-output/**/*.keras
-output/**/*.npz
-output/**/*.log
-output/**/tuner/

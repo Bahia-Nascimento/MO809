@@ -48,7 +48,6 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--cpu", action="store_true")
     parser.add_argument("--paciencia", type=int, default=5)
-    parser.add_argument("--referencia", type=Path, help="Execução anterior com os mesmos pares para comparação.")
     args = parser.parse_args()
     if min(args.trials, args.epocas_busca, args.epocas, args.batch_size, args.paciencia) < 1:
         parser.error("Trials, épocas e batch size devem ser positivos.")
@@ -76,19 +75,6 @@ def main():
     datasets = [dataset_pares(imagens, p, args.batch_size, treino=(i == 0), seed=args.seed)
                 for i, ((imagens, _), p) in enumerate(zip(splits, pares))]
     treino, validacao, teste = datasets
-    np.savez_compressed(out / "indices_pares.npz", indices_treino=it, indices_validacao=iv,
-                        **{f"{nome}_{campo}": v for nome, p in zip(["treino", "validacao", "teste"], pares)
-                           for campo, v in zip(["a", "b", "y"], p)})
-    if args.referencia:
-        # A comparação só é válida se todas as partições e pares coincidirem.
-        with np.load(args.referencia / "indices_pares.npz") as ref, np.load(out / "indices_pares.npz") as atual:
-            if set(ref.files) != set(atual.files):
-                raise ValueError("Referência contém índices incompatíveis.")
-            for chave in ref.files:
-                np.testing.assert_array_equal(ref[chave], atual[chave], err_msg=f"Pares diferentes: {chave}")
-    codigo = out / "codigo"; codigo.mkdir(exist_ok=True)
-    for nome in ["modelo.py", "treinar.py", "dados.py", "config.py", "requirements.txt"]:
-        shutil.copy2(Path(__file__).with_name(nome), codigo / nome)
     # Clientes recebem apenas imagens de teste. Rótulos servem só ao relatório local.
     np.savez_compressed(out / "dados_clientes.npz", imagens=xt, labels=yt)
     class BuscaComHistorico(kt.RandomSearch):
@@ -120,8 +106,6 @@ def main():
     history = modelo.fit(treino, validation_data=validacao, epochs=args.epocas,
                         callbacks=[tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=args.paciencia,
                                    restore_best_weights=True)], verbose=2)
-    salvar_json(out / "historico_retreino.json", history.history)
-    modelo.save(out / "retreino.keras")
     loss_retreino = float(modelo.evaluate(validacao, verbose=0))
     selecionado = "retreino"
     if loss_checkpoint < loss_retreino:
@@ -139,12 +123,6 @@ def main():
     selecao = {"selecionado": selecionado, "trial_vencedor": trial_vencedor.trial_id,
                "loss_checkpoint_busca": loss_checkpoint, "loss_retreino": loss_retreino,
                "loss_validacao": loss_validacao, "loss_treino_inferencia": loss_treino_inferencia}
-    if args.referencia:
-        anterior = tf.keras.models.load_model(args.referencia / "siamesa.keras")
-        selecao["loss_validacao_referencia"] = float(anterior.evaluate(validacao, verbose=0))
-        selecao["loss_treino_referencia_inferencia"] = float(anterior.evaluate(treino, verbose=0))
-        del anterior
-    salvar_json(out / "selecao.json", selecao)
     # Distância pequena significa similaridade alta; não é uma probabilidade.
     dval = modelo.predict(validacao, verbose=0).ravel()
     limiar, acc_val = calibrar_limiar(dval, pares[1][2])
@@ -178,9 +156,6 @@ def main():
                         for g in tf.config.list_physical_devices("GPU")],
                 "segundos": time.monotonic() - inicio}
     salvar_json(out / "metadata.json", metadata)
-    salvar_json(out / "historico.json", history.history)
-    np.savez_compressed(out / "avaliacao.npz", distancias_validacao=dval, y_validacao=pares[1][2],
-                        distancias_teste=dtest, y_teste=pares[2][2])
     with (out / "historico.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["epoca", "loss", "val_loss"])
@@ -205,6 +180,11 @@ def main():
     fig.tight_layout(); fig.savefig(out / "pares_teste.png", dpi=150); plt.close(fig)
     with (out / "arquitetura.txt").open("w", encoding="utf-8") as f:
         modelo.summary(print_fn=lambda linha: f.write(linha + "\n"), expand_nested=True)
+    # O diretório interno do Tuner e o checkpoint temporário foram úteis apenas
+    # durante a busca. Os resultados consolidados permanecem em busca.json,
+    # historico.csv, metadata.json e nos modelos finais.
+    (out / "vencedor_busca.keras").unlink(missing_ok=True)
+    shutil.rmtree(out / "tuner", ignore_errors=True)
     print("RESULTADO:", metadata, flush=True)
 
 
