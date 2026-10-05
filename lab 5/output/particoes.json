@@ -1,0 +1,46 @@
+{
+  "dataset": "CIFAR-10",
+  "seed": 42,
+  "limite_treino": 0,
+  "limite_teste": 0,
+  "clientes": [
+    {
+      "id": 0,
+      "treino": 22500,
+      "validacao": 2500,
+      "teste": 5000,
+      "classes_treino": [
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250
+      ],
+      "sha256": "ec794cb3ce6b18f65a53cf9f837055d74237cd5253cbdff78879f6a34e4d4ef3"
+    },
+    {
+      "id": 1,
+      "treino": 22500,
+      "validacao": 2500,
+      "teste": 5000,
+      "classes_treino": [
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250,
+        2250
+      ],
+      "sha256": "3c8f7908db85684841b5c8bb9ad4f6fe76cf09c8174c6d87ea9a2e884c988724"
+    }
+  ]
+}

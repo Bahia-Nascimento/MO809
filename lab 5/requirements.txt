@@ -1,0 +1,9 @@
+# Ambiente Python 3.9 WSL, alinhado ao laboratório 4.
+tensorflow[and-cuda]==2.20.0
+keras==3.10.0
+numpy==2.0.2
+grpcio==1.80.0
+grpcio-tools==1.73.1
+protobuf==6.33.6
+ray==2.49.2
+matplotlib==3.9.4

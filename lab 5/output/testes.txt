@@ -1,0 +1,81 @@
+TESTES MATEMATICOS E GRPC
+2026-09-24 15:22:30.918676: E external/local_xla/xla/stream_executor/cuda/cuda_platform.cc:51] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+test_avaliacao_e_checkpoint_nao_treinam (test_lab5.Lab5Test) ... I0924 15:22:31.142173    6000 fork_posix.cc:71] Other threads are currently calling into gRPC, skipping fork() handlers
+ok
+test_lote_concorrente_token_replay_e_ultimo_lote (test_lab5.Lab5Test) ... ok
+test_particoes_disjuntas_completas_e_reproduziveis (test_lab5.Lab5Test) ... ok
+test_protocolo_sem_rotulos (test_lab5.Lab5Test) ... ok
+test_split_equivale_rede_unica_em_gradientes_e_updates (test_lab5.Lab5Test) ... ok
+test_timeout_abandona_tape_e_interrompe_sessao (test_lab5.Lab5Test) ... ok
+test_validacao_de_mensagens (test_lab5.Lab5Test) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.882s
+
+OK
+
+Erro máximo absoluto nos gradientes dos cortes: 0
+
+INTEGRACAO RAY E GPU (DADOS SINTETICOS)
+test_tres_clientes_lotes_incompletos_checkpoint_e_teste (__main__.IntegracaoGPU) ... /home/bahia/MO809/venv-gpu/lib/python3.9/site-packages/ray/_private/node.py:1123: ResourceWarning: unclosed file <_io.TextIOWrapper name='/dev/null' mode='w' encoding='UTF-8'>
+  process_info = ray._private.services.start_gcs_server(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/bahia/MO809/venv-gpu/lib/python3.9/site-packages/ray/_private/node.py:1253: ResourceWarning: unclosed file <_io.TextIOWrapper name='/dev/null' mode='w' encoding='UTF-8'>
+  process_info = ray._private.services.start_monitor(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<frozen importlib._bootstrap_external>:647: ResourceWarning: unclosed file <_io.FileIO name='/dev/null' mode='wb' closefd=True>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/bahia/MO809/venv-gpu/lib/python3.9/site-packages/ray/_private/node.py:1188: ResourceWarning: unclosed file <_io.TextIOWrapper name='/dev/null' mode='w' encoding='UTF-8'>
+  process_info = ray._private.services.start_raylet(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/bahia/MO809/venv-gpu/lib/python3.9/site-packages/ray/_private/node.py:1053: ResourceWarning: unclosed file <_io.TextIOWrapper name='/dev/null' mode='w' encoding='UTF-8'>
+  process_info = ray._private.services.start_log_monitor(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+2026-09-24 15:15:39,682	INFO worker.py:1951 -- Started a local Ray instance.
+[36m(ClienteActor pid=4198)[0m WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+[36m(ClienteActor pid=4198)[0m I0000 00:00:1790273741.822220    4198 gpu_device.cc:2020] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 512 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 3050 6GB Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.6
+[36m(ClienteActor pid=4197)[0m WARNING: All log messages before absl::InitializeLog() is called are written to STDERR[32m [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
+[36m(ClienteActor pid=4197)[0m I0000 00:00:1790273751.434955    4197 gpu_device.cc:2020] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 512 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 3050 6GB Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.6[32m [repeated 2x across cluster][0m
+Época 1/1, lote local 1
+Época 1: loss=2.4387, acc=6.67%, val_loss=2.1953, val_acc=16.67%
+/usr/lib/python3.9/subprocess.py:1052: ResourceWarning: subprocess 3890 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+Processos verificados: {
+  "servidor": {
+    "pid": 3695,
+    "device": "/job:localhost/replica:0/task:0/device:GPU:0"
+  },
+  "clientes": [
+    {
+      "client_id": 0,
+      "pid": 4198,
+      "device": "/job:localhost/replica:0/task:0/device:GPU:0",
+      "train_size": 5,
+      "batches": 2
+    },
+    {
+      "client_id": 1,
+      "pid": 4196,
+      "device": "/job:localhost/replica:0/task:0/device:GPU:0",
+      "train_size": 5,
+      "batches": 2
+    },
+    {
+      "client_id": 2,
+      "pid": 4197,
+      "device": "/job:localhost/replica:0/task:0/device:GPU:0",
+      "train_size": 5,
+      "batches": 2
+    }
+  ]
+}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 25.457s
+
+OK
+
+PIP CHECK
+No broken requirements found.
