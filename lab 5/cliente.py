@@ -78,7 +78,8 @@ def train_step(model, head, x_batch, y_batch, optimizer, head_optimizer, stub, c
 
 class Cliente:
     def __init__(self, client_id, endereco, output, seed=42, batch_size=64,
-                 memoria_mb=1024, gpu=True, learning_rate=0.001):
+                 memoria_mb=1024, gpu=True, learning_rate=0.001, dropout=0.0,
+                 pooling_extra=False, batch_normalization=False, somente_validacao=False):
         self.tf = configurar_tensorflow(gpu=gpu, seed=seed, memoria_mb=memoria_mb)
         from modelo import create_partial_model, create_head_model
         self.client_id = client_id
@@ -87,8 +88,10 @@ class Cliente:
         self.folder.mkdir(exist_ok=True)
         # Cada processo lê SOMENTE seu arquivo local; imagens/rótulos não vão a M2.
         with np.load(self.output / "dados" / f"cliente_{client_id}.npz") as data:
-            self.data = {k: data[k] for k in ("x_train", "y_train", "x_val", "y_val", "x_test", "y_test")}
-        self.partial_model = create_partial_model()
+            splits = ("train", "val") if somente_validacao else ("train", "val", "test")
+            self.data = {f"{k}_{s}": data[f"{k}_{s}"] for s in splits for k in ("x", "y")}
+        self.partial_model = create_partial_model(dropout=dropout, pooling_extra=pooling_extra,
+                                                  batch_normalization=batch_normalization)
         self.head_model = create_head_model()
         self.optimizer = self.tf.keras.optimizers.Adam(learning_rate)
         self.head_optimizer = self.tf.keras.optimizers.Adam(learning_rate)
@@ -131,6 +134,8 @@ class Cliente:
     def avaliar(self, split="val"):
         if split not in ("val", "test"):
             raise ValueError("Use val ou test.")
+        if f"x_{split}" not in self.data:
+            raise ValueError("Conjunto de teste indisponível durante a busca.")
         x, y = self.data[f"x_{split}"], self.data[f"y_{split}"]
         loss_sum, correct, tx, rx = 0.0, 0, 0, 0
         for start in range(0, len(x), self.batch_size):

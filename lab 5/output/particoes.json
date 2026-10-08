@@ -3,6 +3,7 @@
   "seed": 42,
   "limite_treino": 0,
   "limite_teste": 0,
+  "inclui_teste": true,
   "clientes": [
     {
       "id": 0,

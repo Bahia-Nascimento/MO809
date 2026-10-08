@@ -38,7 +38,7 @@ def particionar(labels, clientes, seed=42, validacao=True, limite=0):
     return conjuntos
 
 
-def preparar(output, clientes=2, seed=42, limite_treino=0, limite_teste=0):
+def preparar(output, clientes=2, seed=42, limite_treino=0, limite_teste=0, sem_teste=False):
     # Este processo só baixa/prepara arquivos e termina antes do treino GPU.
     tf = configurar_tensorflow(gpu=False, seed=seed)
     (x, y), (xt, yt) = tf.keras.datasets.cifar10.load_data()
@@ -49,14 +49,20 @@ def preparar(output, clientes=2, seed=42, limite_treino=0, limite_teste=0):
     pasta = output / "dados"
     pasta.mkdir(parents=True, exist_ok=False)
     manifesto = {"dataset": "CIFAR-10", "seed": seed, "limite_treino": limite_treino,
-                 "limite_teste": limite_teste, "clientes": []}
+                 "limite_teste": limite_teste, "inclui_teste": not sem_teste, "clientes": []}
     for i in range(clientes):
         if not len(treino[i]) or not len(teste[i]):
             raise ValueError("Limites insuficientes para dar exemplos a todos os clientes.")
         arquivo = pasta / f"cliente_{i}.npz"
-        np.savez(arquivo, x_train=x[treino[i]], y_train=y[treino[i]],
+        arrays = dict(x_train=x[treino[i]], y_train=y[treino[i]],
                  x_val=x[val[i]], y_val=y[val[i]], x_test=xt[teste[i]], y_test=yt[teste[i]],
                  train_indices=treino[i], val_indices=val[i], test_indices=teste[i])
+        if sem_teste:
+            # Keras baixa o arquivo oficial completo; os workers da busca
+            # recebem apenas treino e validação, sem imagens/rótulos de teste.
+            for chave in ("x_test", "y_test", "test_indices"):
+                del arrays[chave]
+        np.savez(arquivo, **arrays)
         manifesto["clientes"].append({"id": i, "treino": len(treino[i]),
             "validacao": len(val[i]), "teste": len(teste[i]),
             "classes_treino": np.bincount(y[treino[i]], minlength=10).tolist(),
@@ -72,6 +78,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--limite-treino", type=int, default=0)
     parser.add_argument("--limite-teste", type=int, default=0)
+    parser.add_argument("--sem-teste", action="store_true")
     args = parser.parse_args()
     if args.clientes < 1 or min(args.limite_treino, args.limite_teste) < 0:
         parser.error("Clientes >= 1; limites >= 0.")

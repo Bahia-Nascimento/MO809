@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from importlib.metadata import version
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -83,29 +84,33 @@ def executar(args):
     if not manifest.exists():
         subprocess.run([sys.executable, str(ROOT / "dados.py"), "--output", str(out),
             "--clientes", str(args.clientes), "--seed", str(args.seed),
-            "--limite-treino", str(args.limite_treino), "--limite-teste", str(args.limite_teste)], check=True)
+            "--limite-treino", str(args.limite_treino), "--limite-teste", str(args.limite_teste)]
+            + (["--sem-teste"] if args.somente_validacao else []), check=True)
     particoes = json.loads(manifest.read_text())
     if (particoes["seed"] != args.seed or len(particoes["clientes"]) != args.clientes
             or particoes.get("limite_treino", 0) != args.limite_treino
             or particoes.get("limite_teste", 0) != args.limite_teste):
         raise ValueError("Partições existentes incompatíveis com a configuração solicitada.")
+    if not args.somente_validacao and not particoes.get("inclui_teste", True):
+        raise ValueError("A avaliação final exige partições com teste.")
     instance_id = uuid.uuid4().hex
-    configuracao = {**vars(args), "output": str(out), "instance_id": instance_id,
+    configuracao = {**vars(args), "output": Path(os.path.relpath(out, ROOT)).as_posix(), "instance_id": instance_id,
         "inicio_utc": datetime.now(timezone.utc).isoformat(), "status": "executando",
         "versoes": {p: version(p) for p in ("tensorflow", "keras", "numpy", "grpcio", "protobuf", "ray")}}
     salvar_json(out / "config.json", configuracao)
     try:
         resultados = treinar(args, out, instance_id)
         salvar_json(out / "resultados.json", resultados)
-        from relatorio import gerar
-        gerar(out)
+        if not args.somente_validacao:
+            from relatorio import gerar
+            gerar(out)
     except BaseException as exc:
         configuracao.update(status="falhou", erro=str(exc))
         salvar_json(out / "config.json", configuracao)
         raise
     configuracao["status"] = "concluido"
     salvar_json(out / "config.json", configuracao)
-    print(f"Concluído. Teste: {resultados['teste']['accuracy']:.2%}. Resultados em {out}", flush=True)
+    print(f"Concluído. Melhor val_loss: {resultados['melhor_val_loss']:.4f}. Resultados em {out}", flush=True)
 
 
 def treinar(args, out, instance_id):
@@ -134,14 +139,14 @@ def treinar(args, out, instance_id):
                     ator = ClienteActor.options(num_gpus=1 / args.clientes).remote(
                         codigo_root=str(ROOT), client_id=i, endereco=endereco, output=str(out),
                         seed=args.seed, batch_size=args.batch_size, memoria_mb=args.memoria_mb,
-                        learning_rate=args.learning_rate)
+                        learning_rate=args.learning_rate, dropout=args.dropout,
+                        pooling_extra=args.pooling_extra, batch_normalization=args.batch_normalization,
+                        somente_validacao=args.somente_validacao)
                     atores.append(ator)
                     infos.append(ray.get(ator.info.remote(), timeout=180))
                 pids = [server_info.pid] + [info["pid"] for info in infos]
                 if len(set(pids)) != len(pids) or any("GPU" not in i["device"] for i in infos):
                     raise RuntimeError("Exigimos processos distintos e forward na GPU em todos os blocos.")
-                salvar_json(out / "processos.json", {"servidor": {"pid": server_info.pid,
-                    "device": server_info.device}, "clientes": infos})
                 with (out / "historico.csv").open("w", newline="", encoding="utf-8") as f:
                     writer = None
                     for epoch in range(1, args.epocas + 1):
@@ -160,6 +165,8 @@ def treinar(args, out, instance_id):
                                 print(f"Época {epoch}/{args.epocas}, lote local {batch + 1}", flush=True)
                         validacao = [ray.get(a.avaliar.remote("val"), timeout=180) for a in atores]
                         train, val = agregar(lotes), agregar(validacao)
+                        if not math.isfinite(train["loss"]) or not math.isfinite(val["loss"]):
+                            raise ValueError("Loss não finita durante o treinamento.")
                         if val["loss"] < best_loss:
                             # Um checkpoint é o CONJUNTO consistente: M2 e M1/M3
                             # de cada cliente, todos na mesma fronteira de época.
@@ -179,21 +186,34 @@ def treinar(args, out, instance_id):
                         writer.writerow(row)
                         f.flush()
                         history.append({**row, "validacao_clientes": validacao})
-                        salvar_json(out / "progresso.json", {"epocas": history, "melhor_epoca": best_epoch})
                         print(f"Época {epoch}: loss={train['loss']:.4f}, acc={train['accuracy']:.2%}, "
                               f"val_loss={val['loss']:.4f}, val_acc={val['accuracy']:.2%}", flush=True)
+                        # A decisão é única para todo o conjunto de modelos;
+                        # callbacks separados por cliente romperiam a sincronia.
+                        if args.patience and epoch - best_epoch >= args.patience:
+                            print(f"Early stopping: {args.patience} épocas sem melhora.", flush=True)
+                            break
                 # O teste oficial só é acessado depois da seleção pela validação.
                 updates = stub.LoadCheckpoint(pb2.Empty(), timeout=60).updates
                 for a in atores:
                     ray.get(a.restaurar.remote(), timeout=60)
-                testes = [ray.get(a.avaliar.remote("test"), timeout=180) for a in atores]
+                validacao_restaurada = agregar([
+                    ray.get(a.avaliar.remote("val"), timeout=180) for a in atores])
+                if abs(validacao_restaurada["loss"] - best_loss) > 1e-5:
+                    raise AssertionError("Checkpoint conjunto não reproduziu a melhor validação.")
+                testes = ([] if args.somente_validacao else
+                    [ray.get(a.avaliar.remote("test"), timeout=180) for a in atores])
                 for a in atores:
                     ray.get(a.fechar.remote(), timeout=30)
-                esperado = args.epocas * sum(i["batches"] for i in infos)
+                esperado = len(history) * sum(i["batches"] for i in infos)
                 if updates != esperado:
                     raise AssertionError(f"Número de updates {updates} != {esperado}.")
                 return {"melhor_epoca": best_epoch, "melhor_val_loss": best_loss, "epocas": history,
-                    "teste": agregar(testes), "teste_clientes": testes, "updates_m2": updates,
+                    "teste": agregar(testes) if testes else None, "teste_clientes": testes,
+                    "validacao_restaurada": validacao_restaurada, "updates_m2": updates,
+                    "epocas_executadas": len(history), "parada_antecipada": len(history) < args.epocas,
+                    "dispositivos": {"servidor": {"pid": server_info.pid, "device": server_info.device},
+                                     "clientes": infos},
                     "segundos": time.perf_counter() - inicio}
             finally:
                 if channel:
@@ -215,12 +235,18 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--learning-rate", type=float, default=0.001)
+    parser.add_argument("--dropout", type=float, default=0.0)
+    parser.add_argument("--pooling-extra", action="store_true")
+    parser.add_argument("--batch-normalization", action="store_true")
+    parser.add_argument("--patience", type=int, default=0, help="Épocas sem melhora; 0 desativa a parada.")
+    parser.add_argument("--somente-validacao", action="store_true", help="Não disponibiliza nem avalia teste.")
     parser.add_argument("--memoria-mb", type=int, default=1024)
-    parser.add_argument("--limite-treino", type=int, default=0, help="0 usa todos; >0 para smoke test.")
+    parser.add_argument("--limite-treino", type=int, default=0, help="Máximo de imagens de treino; 0 usa todas.")
     parser.add_argument("--limite-teste", type=int, default=0)
     args = parser.parse_args()
     if (args.clientes < 1 or args.epocas < 1 or not 1 <= args.batch_size <= MAX_BATCH
             or args.learning_rate <= 0 or not math.isfinite(args.learning_rate)
+            or not 0 <= args.dropout < 1 or args.patience < 0
             or args.memoria_mb < 256 or min(args.limite_treino, args.limite_teste) < 0):
         parser.error("Parâmetros inválidos: clientes/épocas >=1, batch 1..256, LR>0, memória>=256, limites>=0.")
     executar(args)

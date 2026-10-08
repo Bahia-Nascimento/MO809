@@ -20,7 +20,7 @@ def configurar_tensorflow(gpu=True, seed=42, memoria_mb=1024):
     import tensorflow as tf
     dispositivos = tf.config.list_physical_devices("GPU")
     if gpu and not dispositivos:
-        raise RuntimeError("GPU indisponível. Execute com o venv-gpu no WSL.")
+        raise RuntimeError("GPU indisponível. Verifique o driver NVIDIA e a instalação do TensorFlow no ambiente virtual.")
     if gpu:
         # Ray reserva frações LÓGICAS; não limita a VRAM. Cada processo TensorFlow
         # recebe seu próprio teto antes de criar tensores ou inicializar CUDA.

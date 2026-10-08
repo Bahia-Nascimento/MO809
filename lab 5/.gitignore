@@ -1,5 +1,7 @@
 __pycache__/
+*.py[cod]
+.venv/
 output/**/dados/
-output/**/*.keras
 output/**/*.log
-output/smoke*/
+output/nova_execucao/
+output/nova_busca/
